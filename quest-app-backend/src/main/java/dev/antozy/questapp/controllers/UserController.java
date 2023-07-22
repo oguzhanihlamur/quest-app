@@ -1,53 +1,44 @@
 package dev.antozy.questapp.controllers;
 
 import dev.antozy.questapp.entities.User;
-import dev.antozy.questapp.repositories.UserRepository;
+import dev.antozy.questapp.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userService.findAllUsers();
     }
 
     @PostMapping
     public User createUser(@RequestBody User newUser) {
-        return userRepository.save(newUser);
+        return userService.saveOneUser(newUser);
     }
 
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable Long userId) {
         //Custom exception
-        return userRepository.findById(userId).orElse(null);
+        return userService.findUserById(userId);
     }
 
     @PutMapping("/{userId}")
-    public User updateUserById(@PathVariable Long userId, @RequestBody User updatedUser){
-        Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent()){
-            User foundUser = user.get();
-            foundUser.setUserName(updatedUser.getUserName());
-            foundUser.setPassword(updatedUser.getPassword());
-            return userRepository.save(foundUser);
-        } else {
-            return null;
-        }
+    public User updateUserById(@PathVariable Long userId, @RequestBody User updatedUser) {
+        return userService.updateUserById(userId, updatedUser);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable Long userId){
-        userRepository.deleteById(userId);
+    public void deleteUserById(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
     }
 }
