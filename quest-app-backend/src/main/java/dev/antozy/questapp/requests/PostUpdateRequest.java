@@ -1,4 +1,4 @@
-package dev.antozy.questapp.reqıests;
+package dev.antozy.questapp.requests;
 
 import lombok.Data;
 

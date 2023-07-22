@@ -3,8 +3,8 @@ package dev.antozy.questapp.services;
 import dev.antozy.questapp.entities.Post;
 import dev.antozy.questapp.entities.User;
 import dev.antozy.questapp.repositories.PostRepository;
-import dev.antozy.questapp.reqıests.PostCreateRequest;
-import dev.antozy.questapp.reqıests.PostUpdateRequest;
+import dev.antozy.questapp.requests.PostCreateRequest;
+import dev.antozy.questapp.requests.PostUpdateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post saveOnePost(PostCreateRequest newPostCreateRequest) {
+    public Post savePost(PostCreateRequest newPostCreateRequest) {
         User user = userService.findUserById(newPostCreateRequest.getUserId());
         if(user == null){
             return null;

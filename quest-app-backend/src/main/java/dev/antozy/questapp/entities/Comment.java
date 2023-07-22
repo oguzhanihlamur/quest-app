@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -28,6 +29,7 @@ public class Comment {
     User user;
 
     @Lob
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "varchar(1000)")
+    @Type(type = "org.hibernate.type.TextType")
     String text;
 }

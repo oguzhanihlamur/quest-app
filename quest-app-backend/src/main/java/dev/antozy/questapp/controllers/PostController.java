@@ -1,8 +1,8 @@
 package dev.antozy.questapp.controllers;
 
 import dev.antozy.questapp.entities.Post;
-import dev.antozy.questapp.reqıests.PostCreateRequest;
-import dev.antozy.questapp.reqıests.PostUpdateRequest;
+import dev.antozy.questapp.requests.PostCreateRequest;
+import dev.antozy.questapp.requests.PostUpdateRequest;
 import dev.antozy.questapp.services.PostService;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +26,7 @@ public class PostController {
 
     @PostMapping
     public Post createPost(@RequestBody PostCreateRequest newPostCreateRequest) {
-        return postService.saveOnePost(newPostCreateRequest);
+        return postService.savePost(newPostCreateRequest);
     }
 
     @GetMapping("/{postId}")
