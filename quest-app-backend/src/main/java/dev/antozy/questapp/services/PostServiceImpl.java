@@ -5,10 +5,12 @@ import dev.antozy.questapp.entities.User;
 import dev.antozy.questapp.repositories.PostRepository;
 import dev.antozy.questapp.requests.PostCreateRequest;
 import dev.antozy.questapp.requests.PostUpdateRequest;
+import dev.antozy.questapp.responses.PostResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -22,11 +24,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findAllPosts(Optional<Long> userId) {
+    public List<PostResponse> findAllPosts(Optional<Long> userId) {
+        List<Post> postList = null;
         if (userId.isPresent()) {
-            return postRepository.findByUserId(userId.get());
+            postList = postRepository.findByUserId(userId.get());
+
         }
-        return postRepository.findAll();
+        postList = postRepository.findAll();
+
+        return postList.stream().map(PostResponse::new).collect(Collectors.toList());
     }
 
     @Override

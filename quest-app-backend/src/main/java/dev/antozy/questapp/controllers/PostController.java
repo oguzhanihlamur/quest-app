@@ -3,6 +3,7 @@ package dev.antozy.questapp.controllers;
 import dev.antozy.questapp.entities.Post;
 import dev.antozy.questapp.requests.PostCreateRequest;
 import dev.antozy.questapp.requests.PostUpdateRequest;
+import dev.antozy.questapp.responses.PostResponse;
 import dev.antozy.questapp.services.PostService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> getAllPosts(@RequestParam Optional<Long> userId) {
+    public List<PostResponse> getAllPosts(@RequestParam Optional<Long> userId) {
         return postService.findAllPosts(userId);
     }
 
