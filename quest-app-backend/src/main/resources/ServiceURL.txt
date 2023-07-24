@@ -15,4 +15,5 @@
 .../likes
 .../likes?postId={postId}
 .../likes?userId={userId}
+.../likes?userId={userId}&userId={userId}
 .../likes/{likeId}
