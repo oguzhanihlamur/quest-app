@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -9,10 +8,12 @@ import Collapse from '@mui/material/Collapse';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Link } from 'react-router-dom';
+import { Container } from '@mui/material';
+import Comment from '../Comment/Comment';
+import CommentForm from '../Comment/CommentForm';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -26,26 +27,101 @@ const ExpandMore = styled((props) => {
 
 function Post(props) {
 
-    const { userId, userName, title, text } = props;
+    const { userId, userName, title, text, postId, likes } = props;
 
     const [expanded, setExpanded] = React.useState(false);
-
-    const [liked, setLiked] = useState(false);
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [commentList, setCommentList] = useState([]);
+    const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(likes.length);
+    const [likeId, setLikedId] = useState(null);
+    const isInitialMount = useRef(true);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
+        refreshComments();
+        console.log(commentList);
     };
 
     const handleLike = () => {
-        setLiked(!liked);
+        setIsLiked(!isLiked);
+        if (!isLiked) {
+            saveLike();
+            setLikeCount(likeCount + 1);
+        }
+        else {
+            deleteLike();
+            setLikeCount(likeCount - 1);
+        }
+    }
+
+    const refreshComments = () => {
+        fetch("/comments?postId=" + postId)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setCommentList(result);
+                },
+                (error) => {
+                    console.log("Error : ", error);
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    }
+
+    useEffect(() => {
+        if (isInitialMount.current)
+            isInitialMount.current = false;
+        else
+            refreshComments();
+    }, [commentList])
+
+    const checkLikes = () => {
+        var likeControl = likes.find(like => (like.userId === userId));
+        if (likeControl != null) {
+            setLikedId(likeControl.id);
+            setIsLiked(true);
+        }
+    }
+
+    useEffect(() => {
+        checkLikes();
+    }, [])
+
+    const saveLike = () => {
+        fetch("/likes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userId: userId,
+                postId: postId,
+            }),
+        })
+            .then((res) => res.json())
+            .catch((err) => console.log(err))
+    }
+
+    const deleteLike = () => {
+        fetch("/likes/" + likeId, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .catch((err) => console.log(err))
     }
 
     return (
-        <Card sx={{ width: 800, textAlign: "left", margin: 4 }}>
+        <Card sx={{ width: 800, textAlign: "left", margin: 10 }}>
             <CardHeader
                 avatar={
                     <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to={{ pathname: '/users/' + userId }}>
-                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                        <Avatar sx={{ background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)' }} aria-label="recipe">
                             {userName.charAt(0).toUpperCase()}
                         </Avatar>
                     </Link>
@@ -59,8 +135,9 @@ function Post(props) {
             </CardContent>
             <CardActions disableSpacing>
                 <IconButton onClick={handleLike} aria-label="add to favorites" >
-                    <FavoriteIcon style={liked ? { color: "red" } : null} />
+                    <FavoriteIcon style={isLiked ? { color: "red" } : null} />
                 </IconButton>
+                {likeCount}
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
@@ -71,8 +148,12 @@ function Post(props) {
                 </ExpandMore>
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                </CardContent>
+                <Container fixed>
+                    {error ? "Error" : isLoaded ? commentList.map((comment) => (
+                        <Comment userId={1} userName={"antozy"} text={comment.text}></Comment>
+                    )) : "Loading"}
+                    <CommentForm userId={1} userName={"antozy"} postId={postId}></CommentForm>
+                </Container>
             </Collapse>
         </Card>
     )

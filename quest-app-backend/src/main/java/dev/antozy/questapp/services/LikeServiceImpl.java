@@ -7,10 +7,12 @@ import dev.antozy.questapp.repositories.LikeRepository;
 import dev.antozy.questapp.repositories.PostRepository;
 import dev.antozy.questapp.repositories.UserRepository;
 import dev.antozy.questapp.requests.LikeCreateRequest;
+import dev.antozy.questapp.responses.LikeResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LikeServiceImpl implements LikeService {
@@ -26,16 +28,18 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
-    public List<Like> getLikes(Optional<Long> userId, Optional<Long> postId) {
+    public List<LikeResponse> getLikes(Optional<Long> userId, Optional<Long> postId) {
+        List<Like> likeList = null;
         if (userId.isPresent() && postId.isPresent()) {
-            return likeRepository.findAllByUserIdAndPostId(userId, postId);
+            likeList = likeRepository.findAllByUserIdAndPostId(userId, postId);
         } else if (userId.isPresent()) {
-            return likeRepository.findAllByUserId(userId);
+            likeList = likeRepository.findAllByUserId(userId);
         } else if (postId.isPresent()) {
-            return likeRepository.findAllByPostId(postId);
+            likeList = likeRepository.findAllByPostId(postId);
         } else {
-            return likeRepository.findAll();
+            likeList = likeRepository.findAll();
         }
+        return likeList.stream().map(LikeResponse::new).collect(Collectors.toList());
     }
 
     @Override

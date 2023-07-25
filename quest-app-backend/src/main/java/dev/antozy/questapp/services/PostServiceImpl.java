@@ -1,10 +1,12 @@
 package dev.antozy.questapp.services;
 
+import dev.antozy.questapp.entities.Like;
 import dev.antozy.questapp.entities.Post;
 import dev.antozy.questapp.entities.User;
 import dev.antozy.questapp.repositories.PostRepository;
 import dev.antozy.questapp.requests.PostCreateRequest;
 import dev.antozy.questapp.requests.PostUpdateRequest;
+import dev.antozy.questapp.responses.LikeResponse;
 import dev.antozy.questapp.responses.PostResponse;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,12 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
+    private final LikeService likeService;
 
-    public PostServiceImpl(PostRepository postRepository, UserService userService) {
+    public PostServiceImpl(PostRepository postRepository, UserService userService, LikeService likeService) {
         this.postRepository = postRepository;
         this.userService = userService;
+        this.likeService = likeService;
     }
 
     @Override
@@ -28,11 +32,13 @@ public class PostServiceImpl implements PostService {
         List<Post> postList = null;
         if (userId.isPresent()) {
             postList = postRepository.findByUserId(userId.get());
-
         }
         postList = postRepository.findAll();
 
-        return postList.stream().map(PostResponse::new).collect(Collectors.toList());
+        return postList.stream().map( p -> {
+            List<LikeResponse> likes = likeService.getLikes(Optional.empty(),Optional.of(p.getId()));
+            return new PostResponse(p, likes);
+        }).collect(Collectors.toList());
     }
 
     @Override

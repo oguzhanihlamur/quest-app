@@ -3,6 +3,7 @@ package dev.antozy.questapp.controllers;
 import dev.antozy.questapp.entities.Comment;
 import dev.antozy.questapp.entities.Like;
 import dev.antozy.questapp.requests.LikeCreateRequest;
+import dev.antozy.questapp.responses.LikeResponse;
 import dev.antozy.questapp.services.LikeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class LikeController {
     }
 
     @GetMapping
-    public List<Like> getLikes(@RequestParam Optional<Long> userId, @RequestParam Optional<Long> postId) {
+    public List<LikeResponse> getLikes(@RequestParam Optional<Long> userId, @RequestParam Optional<Long> postId) {
         return likeService.getLikes(userId, postId);
     }
 
