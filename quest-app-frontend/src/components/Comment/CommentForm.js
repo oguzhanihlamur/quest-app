@@ -12,6 +12,7 @@ function CommentForm(props) {
         fetch("/comments", {
             method: "POST",
             headers: {
+                "Authorization" : localStorage.getItem("tokenKey"),
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({

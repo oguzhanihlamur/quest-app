@@ -2,6 +2,7 @@ package dev.antozy.questapp.controllers;
 
 import dev.antozy.questapp.entities.User;
 import dev.antozy.questapp.requests.UserRequest;
+import dev.antozy.questapp.responses.AuthResponse;
 import dev.antozy.questapp.security.JwtTokenProvider;
 import dev.antozy.questapp.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -33,24 +34,31 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserRequest loginRequest) {
+    public AuthResponse login(@RequestBody UserRequest loginRequest) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "Bearer " + jwtTokenProvider.generateJwtToken(authentication);
+        User user = userService.getUserByUserName(loginRequest.getUserName());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setMessage("Bearer " + jwtTokenProvider.generateJwtToken(authentication));
+        authResponse.setUserId(user.getId());
+        return authResponse;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest) {
+        AuthResponse authResponse = new AuthResponse();
         if (userService.getUserByUserName(userRequest.getUserName()) != null) {
-            return new ResponseEntity<>("Username already in use.", HttpStatus.BAD_REQUEST);
+            authResponse.setMessage("Username already in use.");
+            return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
         } else {
             User user = new User();
             user.setUserName(userRequest.getUserName());
             user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
             userService.saveOneUser(user);
-
-            return new ResponseEntity<>("User successfully created.", HttpStatus.CREATED);
+            authResponse.setMessage("User successfully created.");
+            authResponse.setUserId(user.getId());
+            return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
         }
     }
 
