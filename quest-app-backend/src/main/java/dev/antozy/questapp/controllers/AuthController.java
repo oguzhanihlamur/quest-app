@@ -5,6 +5,8 @@ import dev.antozy.questapp.requests.UserRequest;
 import dev.antozy.questapp.responses.AuthResponse;
 import dev.antozy.questapp.security.JwtTokenProvider;
 import dev.antozy.questapp.services.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger logger = LogManager.getLogger(AuthController.class);
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
@@ -35,6 +39,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest loginRequest) {
+        logger.info("Login method started.");
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -42,6 +47,7 @@ public class AuthController {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setMessage("Bearer " + jwtTokenProvider.generateJwtToken(authentication));
         authResponse.setUserId(user.getId());
+        logger.info("Login method finished.");
         return authResponse;
     }
 
