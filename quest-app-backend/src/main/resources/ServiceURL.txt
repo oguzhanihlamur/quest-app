@@ -1,6 +1,8 @@
 .../users
 .../users/{userId}
-.../users/{userıd}/profile
+.../users/{userId}/profile
+.../users/{userId}/followers //Pending
+.../users/{userId}/following //Pending
 
 .../posts
 .../posts?userId={userId}
