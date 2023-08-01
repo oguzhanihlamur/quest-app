@@ -53,6 +53,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest) {
+        logger.info("Register method started.");
         AuthResponse authResponse = new AuthResponse();
         if (userService.getUserByUserName(userRequest.getUserName()) != null) {
             authResponse.setMessage("Username already in use.");
@@ -64,6 +65,7 @@ public class AuthController {
             userService.saveOneUser(user);
             authResponse.setMessage("User successfully created.");
             authResponse.setUserId(user.getId());
+            logger.info("Register method finished.");
             return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
         }
     }
