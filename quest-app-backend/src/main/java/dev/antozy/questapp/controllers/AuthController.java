@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest loginRequest) {
-        logger.info("Login method started.");
+        logger.info("Login method started for the userName : " + loginRequest.getUserName());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest) {
-        logger.info("Register method started.");
+        logger.info("Register method started for the userName : " + userRequest.getUserName());
         AuthResponse authResponse = new AuthResponse();
         if (userService.getUserByUserName(userRequest.getUserName()) != null) {
             authResponse.setMessage("Username already in use.");
@@ -65,7 +65,7 @@ public class AuthController {
             userService.saveOneUser(user);
             authResponse.setMessage("User successfully created.");
             authResponse.setUserId(user.getId());
-            logger.info("Register method finished.");
+            logger.info("Register method finished for the userName : " + userRequest.getUserName());
             return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
         }
     }

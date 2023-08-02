@@ -1,11 +1,13 @@
 package dev.antozy.questapp.entities;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "post")
@@ -26,4 +28,11 @@ public class Post {
     @Column(columnDefinition = "varchar(1000)")
     @Type(type = "org.hibernate.type.TextType")
     String text;
+
+    @CreationTimestamp
+    Date createDate;
+
+    @CreationTimestamp
+    Date modifyDate;
+
 }
