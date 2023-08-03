@@ -5,6 +5,7 @@ import dev.antozy.questapp.requests.UserRequest;
 import dev.antozy.questapp.responses.AuthResponse;
 import dev.antozy.questapp.security.JwtTokenProvider;
 import dev.antozy.questapp.services.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Log4j2
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    private static final Logger logger = LogManager.getLogger(AuthController.class);
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest loginRequest) {
-        logger.info("Login method started for the userName : " + loginRequest.getUserName());
+        log.info("Login method started for the userName : " + loginRequest.getUserName());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -47,13 +47,13 @@ public class AuthController {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setMessage("Bearer " + jwtTokenProvider.generateJwtToken(authentication));
         authResponse.setUserId(user.getId());
-        logger.info("Login method finished.");
+        log.info("Login method finished.");
         return authResponse;
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest) {
-        logger.info("Register method started for the userName : " + userRequest.getUserName());
+        log.info("Register method started for the userName : " + userRequest.getUserName());
         AuthResponse authResponse = new AuthResponse();
         if (userService.getUserByUserName(userRequest.getUserName()) != null) {
             authResponse.setMessage("Username already in use.");
@@ -65,7 +65,7 @@ public class AuthController {
             userService.saveOneUser(user);
             authResponse.setMessage("User successfully created.");
             authResponse.setUserId(user.getId());
-            logger.info("Register method finished for the userName : " + userRequest.getUserName());
+            log.info("Register method finished for the userName : " + userRequest.getUserName());
             return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
         }
     }
